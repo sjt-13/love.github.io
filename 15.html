@@ -37,7 +37,8 @@
             top: -100px;
             left: 50%;
             transform: translateX(-50%);
-            width: 320px;
+            width: 90%;
+            max-width: 320px;
             background: rgba(255, 255, 255, 0.95);
             border-radius: 15px;
             padding: 15px;
@@ -47,7 +48,7 @@
             z-index: 1000;
             opacity: 0;
             transition: top 0.8s cubic-bezier(0.18, 1.25, 0.4, 1), opacity 0.8s ease;
-            font-family: "SimHei, " 黑体", sans-serif"
+            font-family: "SimHei, 黑体", sans-serif;
         }
 
         .wechat-icon {
@@ -64,10 +65,12 @@
             font-size: 20px;
             box-shadow: 0 4px 10px rgba(7, 193, 96, 0.4);
             font-family: "Microsoft YaHei", sans-serif;
+            flex-shrink: 0;
         }
 
         .wechat-content {
             flex: 1;
+            min-width: 0;
         }
 
         .wechat-title {
@@ -80,13 +83,16 @@
         .wechat-message {
             font-size: 16px;
             color: #666;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .bullet-screen {
             position: absolute;
             white-space: nowrap;
             color: #fff;
-            font-size: 26px;
+            font-size: 20px;
             text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.8);
             opacity: 0.7;
             z-index: 10;
@@ -113,7 +119,7 @@
                 transform: translateY(50vh) rotate(0deg);
                 opacity: 1;
                 text-shadow: 0 0 15px #ff4d94, 0 0 25px #ff4d94;
-                font-size: 32px;
+                font-size: 26px;
             }
 
             60% {
@@ -194,6 +200,61 @@
             opacity: 0;
             transition: opacity 1.5s ease;
         }
+
+        .play-button {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 15px 30px;
+            background: rgba(255, 255, 255, 0.8);
+            border: none;
+            border-radius: 30px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #ff4d94;
+            cursor: pointer;
+            z-index: 2000;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s;
+        }
+
+        .play-button:hover {
+            background: rgba(255, 255, 255, 1);
+            transform: translate(-50%, -50%) scale(1.05);
+        }
+
+        @media (max-width: 480px) {
+            .bullet-screen {
+                font-size: 16px;
+            }
+
+            @keyframes floatUp {
+                50% {
+                    font-size: 20px;
+                }
+            }
+
+            .wechat-notification {
+                width: 85%;
+                padding: 12px;
+            }
+
+            .wechat-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 18px;
+                margin-right: 12px;
+            }
+
+            .wechat-title {
+                font-size: 16px;
+            }
+
+            .wechat-message {
+                font-size: 14px;
+            }
+        }
     </style>
 </head>
 
@@ -215,7 +276,9 @@
         <div class="music-icon">♪</div>
     </div>
 
-    <audio id="bgMusic" loop autoplay>
+    <button class="play-button" id="playButton">点击一下</button>
+
+    <audio id="bgMusic" loop>
         <source src="1.mp3" type="audio/mpeg">
     </audio>
 
@@ -228,6 +291,7 @@
             const heartsContainer = document.getElementById('heartsContainer');
             const background = document.getElementById('background');
             const blackBg = document.getElementById('blackBg');
+            const playButton = document.getElementById('playButton');
 
             // 弹幕消息数组
             const bulletMessages = [
@@ -251,24 +315,33 @@
 
             let bulletInterval;
             let heartsInterval;
-            let isPlaying = true;
+            let isPlaying = false;
+            let isInitialized = false;
 
-            // 尝试自动播放音乐
-            function tryAutoPlay() {
-                bgMusic.play().then(() => {
-                    console.log('音乐自动播放成功');
-                    musicPlayer.style.background = 'rgba(255, 255, 255, 0.4)';
-                }).catch(error => {
-                    console.log('音乐自动播放受阻，需要用户交互');
-                    musicPlayer.style.background = 'rgba(255, 255, 255, 0.2)';
-                    isPlaying = false;
-                });
-            }
+            // 显示播放按钮
+            playButton.style.display = 'block';
+
+            // 播放按钮点击事件
+            playButton.addEventListener('click', function () {
+                playButton.style.display = 'none';
+                initPage();
+            });
 
             // 初始化页面
             function initPage() {
-                // 尝试自动播放音乐
-                tryAutoPlay();
+                if (isInitialized) return;
+                isInitialized = true;
+
+                // 播放音乐
+                bgMusic.play().then(() => {
+                    console.log('音乐播放成功');
+                    isPlaying = true;
+                    musicPlayer.style.background = 'rgba(255, 255, 255, 0.4)';
+                }).catch(error => {
+                    console.log('音乐播放失败:', error);
+                    isPlaying = false;
+                    musicPlayer.style.background = 'rgba(255, 255, 255, 0.2)';
+                });
 
                 // 1秒后显示微信通知
                 setTimeout(() => {
@@ -297,6 +370,9 @@
 
             // 开始弹幕函数
             function startBulletScreen() {
+                // 先清除可能存在的旧定时器
+                if (bulletInterval) clearInterval(bulletInterval);
+
                 bulletInterval = setInterval(() => {
                     createBullet();
                 }, 800);
@@ -311,8 +387,9 @@
                 const randomMessage = bulletMessages[Math.floor(Math.random() * bulletMessages.length)];
                 bullet.textContent = randomMessage;
 
-                // 随机设置弹幕的字体大小
-                const fontSize = Math.floor(Math.random() * 8) + 24;
+                // 根据屏幕宽度调整字体大小
+                const baseSize = window.innerWidth < 480 ? 16 : 24;
+                const fontSize = Math.floor(Math.random() * 8) + baseSize;
                 bullet.style.fontSize = `${fontSize}px`;
 
                 // 随机设置弹幕的垂直位置
@@ -335,6 +412,9 @@
 
             // 开始爱心效果
             function startHearts() {
+                // 先清除可能存在的旧定时器
+                if (heartsInterval) clearInterval(heartsInterval);
+
                 heartsInterval = setInterval(() => {
                     createHeart();
                 }, 500);
@@ -387,15 +467,17 @@
                     musicPlayer.style.background = 'rgba(255, 255, 255, 0.2)';
                 } else {
                     bgMusic.play().catch(e => {
-                        console.log('音乐播放需要用户交互');
+                        console.log('音乐播放失败:', e);
                     });
                     musicPlayer.style.background = 'rgba(255, 255, 255, 0.4)';
                 }
                 isPlaying = !isPlaying;
             });
 
-            // 初始化页面
-            initPage();
+            // 窗口大小变化时调整元素
+            window.addEventListener('resize', function () {
+                // 可以添加响应式调整逻辑
+            });
         });
     </script>
 </body>
