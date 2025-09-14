@@ -1,305 +1,403 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>星空下的浪漫告白</title>
-    <link href="https://fonts.googleapis.com/css2?family=QingKe+HuangYou&family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
+    <title>浪漫专属消息</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
-            background: linear-gradient(to bottom, #0a0a2a, #1a1a4a, #2a2a5a);
-            color: #fff;
-            font-family: 'Ma Shan Zheng', 'QingKe HuangYou', cursive, sans-serif;
-            min-height: 100vh;
-            overflow-x: hidden;
-            position: relative;
+            font-family: "Microsoft YaHei", sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            background-color: #000;
+            color: white;
         }
-        
-        #stars {
+
+        #background {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: 1;
+            background: url('1.jpg') no-repeat center center;
+            background-size: cover;
+            z-index: -2;
+            transition: opacity 1.5s ease;
         }
-        
-        .container {
-            position: relative;
-            z-index: 2;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 2rem;
-            text-align: center;
+
+        .wechat-notification {
+            position: fixed;
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 320px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: top 0.8s cubic-bezier(0.18, 1.25, 0.4, 1), opacity 0.8s ease;
+            font-family: "SimHei, " 黑体", sans-serif"
         }
-        
-        .header {
-            margin: 2rem 0;
-            animation: fadeIn 2s ease-in-out;
-        }
-        
-        h1 {
-            font-size: 3.5rem;
-            margin-bottom: 1rem;
-            background: linear-gradient(45deg, #ff9ee0, #ff6b6b, #ffa8e4);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 15px rgba(255, 158, 224, 0.5);
-        }
-        
-        .subtitle {
-            font-size: 1.5rem;
-            color: #d1b3ff;
-            margin-bottom: 2rem;
-        }
-        
-        .love-letter {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 2.5rem;
-            margin: 2rem 0;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 0 25px rgba(255, 182, 233, 0.3);
-            animation: fadeUp 2s ease-in-out;
-        }
-        
-        .message {
-            font-size: 1.4rem;
-            line-height: 1.8;
-            margin-bottom: 1.5rem;
-            text-align: center;
-        }
-        
-        .names {
+
+        .wechat-icon {
+            width: 45px;
+            height: 45px;
+            background: #07C160;
+            border-radius: 10px;
             display: flex;
             justify-content: center;
-            gap: 1rem;
-            margin-top: 2rem;
-            flex-wrap: wrap;
-        }
-        
-        .name-input {
-            background: rgba(255, 255, 255, 0.15);
-            border: none;
-            border-radius: 50px;
-            padding: 0.8rem 1.5rem;
+            align-items: center;
+            margin-right: 15px;
             color: white;
-            font-size: 1.1rem;
-            text-align: center;
-            width: 220px;
-            transition: all 0.3s ease;
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            font-weight: bold;
+            font-size: 20px;
+            box-shadow: 0 4px 10px rgba(7, 193, 96, 0.4);
+            font-family: "Microsoft YaHei", sans-serif;
         }
-        
-        .name-input:focus {
-            outline: none;
-            box-shadow: 0 0 15px rgba(255, 158, 224, 0.5);
+
+        .wechat-content {
+            flex: 1;
+        }
+
+        .wechat-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #333;
+            font-size: 18px;
+        }
+
+        .wechat-message {
+            font-size: 16px;
+            color: #666;
+        }
+
+        .bullet-screen {
+            position: absolute;
+            white-space: nowrap;
+            color: #fff;
+            font-size: 26px;
+            text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.8);
+            opacity: 0.7;
+            z-index: 10;
+            font-family: "华文琥珀", "Microsoft YaHei", sans-serif;
+            animation: floatUp linear forwards;
+            transform-origin: center;
+            transition: opacity 0.5s, text-shadow 0.5s;
+        }
+
+        @keyframes floatUp {
+            0% {
+                transform: translateY(100vh) rotate(-5deg);
+            }
+
+            20% {
+                transform: translateY(80vh) rotate(-3deg);
+            }
+
+            40% {
+                transform: translateY(60vh) rotate(-1deg);
+            }
+
+            50% {
+                transform: translateY(50vh) rotate(0deg);
+                opacity: 1;
+                text-shadow: 0 0 15px #ff4d94, 0 0 25px #ff4d94;
+                font-size: 32px;
+            }
+
+            60% {
+                transform: translateY(40vh) rotate(1deg);
+            }
+
+            80% {
+                transform: translateY(20vh) rotate(3deg);
+            }
+
+            100% {
+                transform: translateY(-100px) rotate(5deg);
+                opacity: 0;
+            }
+        }
+
+        .music-player {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
             background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+            transition: transform 0.3s, background 0.3s;
         }
-        
-        .heart {
-            position: absolute;
-            z-index: 2;
-            pointer-events: none;
-            animation: float 6s ease-in-out infinite;
+
+        .music-player:hover {
+            transform: scale(1.1);
+            background: rgba(255, 255, 255, 0.3);
         }
-        
-        .heart::before, .heart::after {
-            content: '';
-            background-color: #ff6b6b;
-            position: absolute;
+
+        .music-icon {
+            color: white;
+            font-size: 24px;
+        }
+
+        .hearts-container {
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
-            border-radius: 50%;
+            pointer-events: none;
+            z-index: 5;
         }
-        
-        .heart::before {
-            transform: translateX(-50%);
+
+        .heart {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            opacity: 0.7;
+            animation: floatHeart linear forwards;
         }
-        
-        .heart::after {
-            transform: translateY(-50%);
-        }
-        
-        .actions {
-            margin: 2rem 0;
-        }
-        
-        .btn {
-            background: linear-gradient(45deg, #ff6b6b, #ff9ee0);
-            border: none;
-            border-radius: 50px;
-            padding: 1rem 2.5rem;
-            color: white;
-            font-size: 1.2rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
-        }
-        
-        .btn:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(255, 107, 107, 0.6);
-        }
-        
-        .footer {
-            margin-top: 3rem;
-            color: #a0a0b8;
-            font-size: 0.9rem;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        @keyframes fadeUp {
-            from { 
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to { 
-                opacity: 1;
-                transform: translateY(0);
+
+        @keyframes floatHeart {
+            to {
+                transform: translateY(-100vh);
             }
         }
-        
-        @keyframes float {
-            0% { transform: translate(0, 0) rotate(0deg); }
-            50% { transform: translate(20px, -20px) rotate(20deg); }
-            100% { transform: translate(0, 0) rotate(0deg); }
-        }
-        
-        @keyframes twinkle {
-            0% { opacity: 0.2; }
-            50% { opacity: 1; }
-            100% { opacity: 0.2; }
-        }
-        
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 2.5rem;
-            }
-            
-            .message {
-                font-size: 1.2rem;
-            }
-            
-            .names {
-                flex-direction: column;
-                align-items: center;
-            }
+
+        .black-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 1.5s ease;
         }
     </style>
 </head>
+
 <body>
-    <div id="stars"></div>
-    <div class="container">
-        <div class="header">
-            <h1>星空下的浪漫告白</h1>
-            <p class="subtitle">在亿万星辰中，我只看见你的光芒</p>
-        </div>
-        
-        <div class="love-letter">
-            <p class="message" id="loveMessage">亲爱的，自从遇见你，我的世界变得完整。你的笑容如星光般璀璨，照亮我生命的每一个角落。在这浩瀚宇宙中，我愿与你携手，共度余生。</p>
-        </div>
-        
-        <div class="actions">
-            <button class="btn" id="generateBtn">生成专属告白</button>
-        </div>
-        
-        <div class="footer">
-            <p>永恒的爱意，如同星辰永不熄灭</p>
+    <div id="background"></div>
+    <div class="black-bg" id="blackBg"></div>
+
+    <div class="wechat-notification" id="wechatNotification">
+        <div class="wechat-icon">微</div>
+        <div class="wechat-content">
+            <div class="wechat-title">微信</div>
+            <div class="wechat-message">你有一条新的消息，请注意查收</div>
         </div>
     </div>
 
+    <div class="hearts-container" id="heartsContainer"></div>
+
+    <div class="music-player" id="musicPlayer">
+        <div class="music-icon">♪</div>
+    </div>
+
+    <audio id="bgMusic" loop autoplay>
+        <source src="1.mp3" type="audio/mpeg">
+    </audio>
+
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // 创建星空背景
-            const stars = document.getElementById('stars');
-            const starCount = 200;
-            
-            for (let i = 0; i < starCount; i++) {
-                const star = document.createElement('div');
-                star.style.position = 'absolute';
-                star.style.width = Math.random() * 3 + 'px';
-                star.style.height = star.style.width;
-                star.style.backgroundColor = 'white';
-                star.style.borderRadius = '50%';
-                star.style.left = Math.random() * 100 + '%';
-                star.style.top = Math.random() * 100 + '%';
-                star.style.opacity = Math.random() * 0.7 + 0.3;
-                star.style.animation = `twinkle ${Math.random() * 5 + 3}s infinite ease-in-out`;
-                star.style.animationDelay = Math.random() * 5 + 's';
-                stars.appendChild(star);
+        document.addEventListener('DOMContentLoaded', function () {
+            const body = document.body;
+            const wechatNotification = document.getElementById('wechatNotification');
+            const musicPlayer = document.getElementById('musicPlayer');
+            const bgMusic = document.getElementById('bgMusic');
+            const heartsContainer = document.getElementById('heartsContainer');
+            const background = document.getElementById('background');
+            const blackBg = document.getElementById('blackBg');
+
+            // 弹幕消息数组
+            const bulletMessages = [
+                "💕 你在身边，在你身边 💕",
+                "🌹 I love you 🌹",
+                "💖 我喜欢你 💖",
+                "✨ 在一起~ ✨",
+                "💑 kiss~ kiss~ 💑",
+                "🌟 与你相遇，好幸运 🌟",
+                "🎁 No one but you 🎁",
+                "🌄 想和你一起看遍世间美景 🌄",
+                "🌞 每一天因你而美好 🌞",
+                "👫 我戒不掉你，像戒不掉呼吸 👫",
+                "🌸 你是我生命中最美的风景 🌸",
+                "💖 I just want you to be happy~ 💖",
+                "🚢 此生不负相遇，未来继续同行 🚢",
+                "💘 所念皆星河，星河皆是你 💘",
+                "🌺 You are always my first choice 🌺",
+                "💞 心之所向是你，目光所及也是你 💞"
+            ];
+
+            let bulletInterval;
+            let heartsInterval;
+            let isPlaying = true;
+
+            // 尝试自动播放音乐
+            function tryAutoPlay() {
+                bgMusic.play().then(() => {
+                    console.log('音乐自动播放成功');
+                    musicPlayer.style.background = 'rgba(255, 255, 255, 0.4)';
+                }).catch(error => {
+                    console.log('音乐自动播放受阻，需要用户交互');
+                    musicPlayer.style.background = 'rgba(255, 255, 255, 0.2)';
+                    isPlaying = false;
+                });
             }
-            
-            // 创建漂浮的爱心
+
+            // 初始化页面
+            function initPage() {
+                // 尝试自动播放音乐
+                tryAutoPlay();
+
+                // 1秒后显示微信通知
+                setTimeout(() => {
+                    wechatNotification.style.top = '50%';
+                    wechatNotification.style.opacity = '1';
+                    wechatNotification.style.transform = 'translate(-50%, -50%)';
+                }, 1000);
+
+                // 2秒后切换到黑色背景并开始弹幕和爱心效果
+                setTimeout(() => {
+                    wechatNotification.style.top = '-100px';
+                    wechatNotification.style.opacity = '0';
+                    wechatNotification.style.transform = 'translateX(-50%)';
+
+                    // 切换到黑色背景
+                    background.style.opacity = '0';
+                    blackBg.style.opacity = '1';
+
+                    // 开始弹幕
+                    startBulletScreen();
+
+                    // 开始爱心效果
+                    startHearts();
+                }, 3000);
+            }
+
+            // 开始弹幕函数
+            function startBulletScreen() {
+                bulletInterval = setInterval(() => {
+                    createBullet();
+                }, 800);
+            }
+
+            // 创建单个弹幕
+            function createBullet() {
+                const bullet = document.createElement('div');
+                bullet.className = 'bullet-screen';
+
+                // 随机选择一条消息
+                const randomMessage = bulletMessages[Math.floor(Math.random() * bulletMessages.length)];
+                bullet.textContent = randomMessage;
+
+                // 随机设置弹幕的字体大小
+                const fontSize = Math.floor(Math.random() * 8) + 24;
+                bullet.style.fontSize = `${fontSize}px`;
+
+                // 随机设置弹幕的垂直位置
+                const left = Math.random() * 100;
+                bullet.style.left = `${left}vw`;
+
+                // 随机设置弹幕的动画时长
+                const duration = Math.floor(Math.random() * 8) + 12;
+                bullet.style.animationDuration = `${duration}s`;
+
+                document.body.appendChild(bullet);
+
+                // 动画结束后移除弹幕元素
+                setTimeout(() => {
+                    if (bullet.parentNode) {
+                        bullet.parentNode.removeChild(bullet);
+                    }
+                }, duration * 1000);
+            }
+
+            // 开始爱心效果
+            function startHearts() {
+                heartsInterval = setInterval(() => {
+                    createHeart();
+                }, 500);
+            }
+
+            // 创建爱心
             function createHeart() {
                 const heart = document.createElement('div');
-                heart.classList.add('heart');
-                
-                const size = Math.random() * 20 + 10;
-                heart.style.width = size + 'px';
-                heart.style.height = size + 'px';
-                
-                const colors = ['#ff6b6b', '#ff9ee0', '#ffa8e4', '#ff8ed4'];
-                const color = colors[Math.floor(Math.random() * colors.length)];
-                
-                heart.style.setProperty('--heart-color', color);
-                
-                heart.style.left = Math.random() * 100 + '%';
-                heart.style.top = Math.random() * 100 + '%';
-                heart.style.animationDuration = (Math.random() * 10 + 5) + 's';
-                
-                document.body.appendChild(heart);
-                
-                // 一段时间后移除爱心
-                setTimeout(() => {
-                    heart.remove();
-                }, 15000);
-            }
-            
-            // 定期创建爱心
-            setInterval(createHeart, 800);
-            
-            // 初始创建一些爱心
-            for (let i = 0; i < 15; i++) {
-                setTimeout(createHeart, i * 100);
-            }
-            
-            // 生成告白
-            const generateBtn = document.getElementById('generateBtn');
-            const loveMessage = document.getElementById('loveMessage');
-            
-            const messages = [
-                "我喜欢你",
-                "我爱你你",
-            ];
-            
-            generateBtn.addEventListener('click', function() {
-                
-                const randomMessage = messages[Math.floor(Math.random() * messages.length)];
-                
-                loveMessage.textContent = randomMessage;
-                
-                // 添加一些爱心动画效果
-                for (let i = 0; i < 10; i++) {
-                    setTimeout(createHeart, i * 150);
+                heart.className = 'heart';
+
+                // 随机选择爱心颜色
+                const heartColors = ['red', 'blue', 'pink'];
+                const randomColor = heartColors[Math.floor(Math.random() * heartColors.length)];
+
+                if (randomColor === 'red') {
+                    heart.style.backgroundImage = "url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"%23ff4d4d\"><path d=\"M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z\"/></svg>')";
+                } else if (randomColor === 'blue') {
+                    heart.style.backgroundImage = "url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"%2344aaff\"><path d=\"M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z\"/></svg>')";
+                } else {
+                    heart.style.backgroundImage = "url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"%23ff9ecb\"><path d=\"M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z\"/></svg>')";
                 }
+
+                // 随机设置爱心大小
+                const size = Math.floor(Math.random() * 25) + 15;
+                heart.style.width = `${size}px`;
+                heart.style.height = `${size}px`;
+
+                // 随机设置爱心的水平位置
+                const left = Math.random() * 100;
+                heart.style.left = `${left}vw`;
+
+                // 随机设置爱心的动画时长
+                const duration = Math.floor(Math.random() * 10) + 10;
+                heart.style.animationDuration = `${duration}s`;
+
+                heartsContainer.appendChild(heart);
+
+                // 动画结束后移除爱心元素
+                setTimeout(() => {
+                    if (heart.parentNode) {
+                        heart.parentNode.removeChild(heart);
+                    }
+                }, duration * 1000);
+            }
+
+            // 音乐播放控制
+            musicPlayer.addEventListener('click', function () {
+                if (isPlaying) {
+                    bgMusic.pause();
+                    musicPlayer.style.background = 'rgba(255, 255, 255, 0.2)';
+                } else {
+                    bgMusic.play().catch(e => {
+                        console.log('音乐播放需要用户交互');
+                    });
+                    musicPlayer.style.background = 'rgba(255, 255, 255, 0.4)';
+                }
+                isPlaying = !isPlaying;
             });
-            
-            
-            // 初始生成一次消息
-            generateBtn.click();
+
+            // 初始化页面
+            initPage();
         });
     </script>
 </body>
+
 </html>
