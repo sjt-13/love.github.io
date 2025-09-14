@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>星空下的浪漫告白</title>
+    <link href="https://fonts.googleapis.com/css2?family=QingKe+HuangYou&family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: linear-gradient(to bottom, #0a0a2a, #1a1a4a, #2a2a5a);
+            color: #fff;
+            font-family: 'Ma Shan Zheng', 'QingKe HuangYou', cursive, sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        #stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        
+        .container {
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .header {
+            margin: 2rem 0;
+            animation: fadeIn 2s ease-in-out;
+        }
+        
+        h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #ff9ee0, #ff6b6b, #ffa8e4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 15px rgba(255, 158, 224, 0.5);
+        }
+        
+        .subtitle {
+            font-size: 1.5rem;
+            color: #d1b3ff;
+            margin-bottom: 2rem;
+        }
+        
+        .love-letter {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2.5rem;
+            margin: 2rem 0;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 25px rgba(255, 182, 233, 0.3);
+            animation: fadeUp 2s ease-in-out;
+        }
+        
+        .message {
+            font-size: 1.4rem;
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        
+        .names {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .name-input {
+            background: rgba(255, 255, 255, 0.15);
+            border: none;
+            border-radius: 50px;
+            padding: 0.8rem 1.5rem;
+            color: white;
+            font-size: 1.1rem;
+            text-align: center;
+            width: 220px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .name-input:focus {
+            outline: none;
+            box-shadow: 0 0 15px rgba(255, 158, 224, 0.5);
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .heart {
+            position: absolute;
+            z-index: 2;
+            pointer-events: none;
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .heart::before, .heart::after {
+            content: '';
+            background-color: #ff6b6b;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+        }
+        
+        .heart::before {
+            transform: translateX(-50%);
+        }
+        
+        .heart::after {
+            transform: translateY(-50%);
+        }
+        
+        .actions {
+            margin: 2rem 0;
+        }
+        
+        .btn {
+            background: linear-gradient(45deg, #ff6b6b, #ff9ee0);
+            border: none;
+            border-radius: 50px;
+            padding: 1rem 2.5rem;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+        
+        .btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(255, 107, 107, 0.6);
+        }
+        
+        .footer {
+            margin-top: 3rem;
+            color: #a0a0b8;
+            font-size: 0.9rem;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes fadeUp {
+            from { 
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes float {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            50% { transform: translate(20px, -20px) rotate(20deg); }
+            100% { transform: translate(0, 0) rotate(0deg); }
+        }
+        
+        @keyframes twinkle {
+            0% { opacity: 0.2; }
+            50% { opacity: 1; }
+            100% { opacity: 0.2; }
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .message {
+                font-size: 1.2rem;
+            }
+            
+            .names {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="stars"></div>
+    <div class="container">
+        <div class="header">
+            <h1>星空下的浪漫告白</h1>
+            <p class="subtitle">在亿万星辰中，我只看见你的光芒</p>
+        </div>
+        
+        <div class="love-letter">
+            <p class="message" id="loveMessage">亲爱的，自从遇见你，我的世界变得完整。你的笑容如星光般璀璨，照亮我生命的每一个角落。在这浩瀚宇宙中，我愿与你携手，共度余生。</p>
+        </div>
+        
+        <div class="actions">
+            <button class="btn" id="generateBtn">生成专属告白</button>
+        </div>
+        
+        <div class="footer">
+            <p>永恒的爱意，如同星辰永不熄灭</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 创建星空背景
+            const stars = document.getElementById('stars');
+            const starCount = 200;
+            
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.style.position = 'absolute';
+                star.style.width = Math.random() * 3 + 'px';
+                star.style.height = star.style.width;
+                star.style.backgroundColor = 'white';
+                star.style.borderRadius = '50%';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.opacity = Math.random() * 0.7 + 0.3;
+                star.style.animation = `twinkle ${Math.random() * 5 + 3}s infinite ease-in-out`;
+                star.style.animationDelay = Math.random() * 5 + 's';
+                stars.appendChild(star);
+            }
+            
+            // 创建漂浮的爱心
+            function createHeart() {
+                const heart = document.createElement('div');
+                heart.classList.add('heart');
+                
+                const size = Math.random() * 20 + 10;
+                heart.style.width = size + 'px';
+                heart.style.height = size + 'px';
+                
+                const colors = ['#ff6b6b', '#ff9ee0', '#ffa8e4', '#ff8ed4'];
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                
+                heart.style.setProperty('--heart-color', color);
+                
+                heart.style.left = Math.random() * 100 + '%';
+                heart.style.top = Math.random() * 100 + '%';
+                heart.style.animationDuration = (Math.random() * 10 + 5) + 's';
+                
+                document.body.appendChild(heart);
+                
+                // 一段时间后移除爱心
+                setTimeout(() => {
+                    heart.remove();
+                }, 15000);
+            }
+            
+            // 定期创建爱心
+            setInterval(createHeart, 800);
+            
+            // 初始创建一些爱心
+            for (let i = 0; i < 15; i++) {
+                setTimeout(createHeart, i * 100);
+            }
+            
+            // 生成告白
+            const generateBtn = document.getElementById('generateBtn');
+            const loveMessage = document.getElementById('loveMessage');
+            
+            const messages = [
+                "我喜欢你",
+                "我爱你你",
+            ];
+            
+            generateBtn.addEventListener('click', function() {
+                
+                const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+                
+                loveMessage.textContent = randomMessage;
+                
+                // 添加一些爱心动画效果
+                for (let i = 0; i < 10; i++) {
+                    setTimeout(createHeart, i * 150);
+                }
+            });
+            
+            
+            // 初始生成一次消息
+            generateBtn.click();
+        });
+    </script>
+</body>
+</html>
