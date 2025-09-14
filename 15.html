@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>浪漫专属消息</title>
+    <title>NheutKgRr74I</title>
     <style>
         * {
             margin: 0;
@@ -97,43 +97,9 @@
             opacity: 0.7;
             z-index: 10;
             font-family: "华文琥珀", "Microsoft YaHei", sans-serif;
-            animation: floatUp linear forwards;
             transform-origin: center;
             transition: opacity 0.5s, text-shadow 0.5s;
-        }
-
-        @keyframes floatUp {
-            0% {
-                transform: translateY(100vh) rotate(-5deg);
-            }
-
-            20% {
-                transform: translateY(80vh) rotate(-3deg);
-            }
-
-            40% {
-                transform: translateY(60vh) rotate(-1deg);
-            }
-
-            50% {
-                transform: translateY(50vh) rotate(0deg);
-                opacity: 1;
-                text-shadow: 0 0 15px #ff4d94, 0 0 25px #ff4d94;
-                font-size: 26px;
-            }
-
-            60% {
-                transform: translateY(40vh) rotate(1deg);
-            }
-
-            80% {
-                transform: translateY(20vh) rotate(3deg);
-            }
-
-            100% {
-                transform: translateY(-100px) rotate(5deg);
-                opacity: 0;
-            }
+            will-change: transform;
         }
 
         .music-player {
@@ -229,12 +195,6 @@
                 font-size: 16px;
             }
 
-            @keyframes floatUp {
-                50% {
-                    font-size: 20px;
-                }
-            }
-
             .wechat-notification {
                 width: 85%;
                 padding: 12px;
@@ -317,6 +277,7 @@
             let heartsInterval;
             let isPlaying = false;
             let isInitialized = false;
+            let screenHeight = window.innerHeight;
 
             // 显示播放按钮
             playButton.style.display = 'block';
@@ -373,6 +334,9 @@
                 // 先清除可能存在的旧定时器
                 if (bulletInterval) clearInterval(bulletInterval);
 
+                // 更新屏幕高度
+                screenHeight = window.innerHeight;
+
                 bulletInterval = setInterval(() => {
                     createBullet();
                 }, 800);
@@ -392,22 +356,54 @@
                 const fontSize = Math.floor(Math.random() * 8) + baseSize;
                 bullet.style.fontSize = `${fontSize}px`;
 
-                // 随机设置弹幕的垂直位置
+                // 随机设置弹幕的水平位置
                 const left = Math.random() * 100;
                 bullet.style.left = `${left}vw`;
 
-                // 随机设置弹幕的动画时长
-                const duration = Math.floor(Math.random() * 8) + 12;
-                bullet.style.animationDuration = `${duration}s`;
+                // 设置弹幕初始位置（屏幕底部）
+                bullet.style.bottom = `-50px`;
 
                 document.body.appendChild(bullet);
 
-                // 动画结束后移除弹幕元素
-                setTimeout(() => {
-                    if (bullet.parentNode) {
-                        bullet.parentNode.removeChild(bullet);
+                // 使用requestAnimationFrame实现平滑动画
+                const startTime = Date.now();
+                const duration = (Math.floor(Math.random() * 8) + 12) * 1000; // 转换为毫秒
+
+                function animateBullet() {
+                    const elapsed = Date.now() - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+
+                    if (progress < 1) {
+                        // 计算当前位置
+                        const currentBottom = -50 + (screenHeight + 100) * progress;
+                        bullet.style.bottom = `${currentBottom}px`;
+
+                        // 添加旋转效果
+                        const rotation = -5 + 10 * progress;
+                        bullet.style.transform = `rotate(${rotation}deg)`;
+
+                        // 在中间位置添加特效
+                        if (progress > 0.4 && progress < 0.6) {
+                            bullet.style.opacity = '1';
+                            bullet.style.textShadow = '0 0 15px #ff4d94, 0 0 25px #ff4d94';
+                            bullet.style.fontSize = `${fontSize + 6}px`;
+                        } else {
+                            bullet.style.opacity = '0.7';
+                            bullet.style.textShadow = '1px 1px 5px rgba(0, 0, 0, 0.8)';
+                            bullet.style.fontSize = `${fontSize}px`;
+                        }
+
+                        requestAnimationFrame(animateBullet);
+                    } else {
+                        // 动画结束，移除元素
+                        if (bullet.parentNode) {
+                            bullet.parentNode.removeChild(bullet);
+                        }
                     }
-                }, duration * 1000);
+                }
+
+                // 开始动画
+                requestAnimationFrame(animateBullet);
             }
 
             // 开始爱心效果
@@ -474,9 +470,17 @@
                 isPlaying = !isPlaying;
             });
 
-            // 窗口大小变化时调整元素
+            // 窗口大小变化时重新计算屏幕高度
             window.addEventListener('resize', function () {
-                // 可以添加响应式调整逻辑
+                screenHeight = window.innerHeight;
+
+                // 如果弹幕正在运行，重新启动弹幕
+                if (isInitialized) {
+                    if (bulletInterval) {
+                        clearInterval(bulletInterval);
+                        startBulletScreen();
+                    }
+                }
             });
         });
     </script>
