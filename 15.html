@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NheutKgRr74I</title>
+    <title>浪漫专属消息</title>
     <style>
         * {
             margin: 0;
@@ -92,7 +92,8 @@
             position: absolute;
             white-space: nowrap;
             color: #fff;
-            font-size: 20px;
+            font-size: 16px;
+            /* 减小字体大小 */
             text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.8);
             opacity: 0.7;
             z-index: 10;
@@ -192,7 +193,8 @@
 
         @media (max-width: 480px) {
             .bullet-screen {
-                font-size: 16px;
+                font-size: 14px;
+                /* 移动端更小的字体 */
             }
 
             .wechat-notification {
@@ -278,6 +280,7 @@
             let isPlaying = false;
             let isInitialized = false;
             let screenHeight = window.innerHeight;
+            let activeBullets = []; // 跟踪所有活动弹幕
 
             // 显示播放按钮
             playButton.style.display = 'block';
@@ -352,22 +355,25 @@
                 bullet.textContent = randomMessage;
 
                 // 根据屏幕宽度调整字体大小
-                const baseSize = window.innerWidth < 480 ? 16 : 24;
-                const fontSize = Math.floor(Math.random() * 8) + baseSize;
+                const baseSize = window.innerWidth < 480 ? 14 : 16; // 减小基础字体大小
+                const fontSize = Math.floor(Math.random() * 4) + baseSize; // 减小随机范围
                 bullet.style.fontSize = `${fontSize}px`;
 
                 // 随机设置弹幕的水平位置
-                const left = Math.random() * 100;
-                bullet.style.left = `${left}vw`;
+                const left = Math.random() * 90 + 5; // 限制在5%-95%之间，避免边缘显示问题
+                bullet.style.left = `${left}%`;
 
                 // 设置弹幕初始位置（屏幕底部）
                 bullet.style.bottom = `-50px`;
 
                 document.body.appendChild(bullet);
 
+                // 添加到活动弹幕数组
+                activeBullets.push(bullet);
+
                 // 使用requestAnimationFrame实现平滑动画
                 const startTime = Date.now();
-                const duration = (Math.floor(Math.random() * 8) + 12) * 1000; // 转换为毫秒
+                const duration = (Math.floor(Math.random() * 6) + 10) * 1000; // 减小随机范围，使动画更一致
 
                 function animateBullet() {
                     const elapsed = Date.now() - startTime;
@@ -379,14 +385,14 @@
                         bullet.style.bottom = `${currentBottom}px`;
 
                         // 添加旋转效果
-                        const rotation = -5 + 10 * progress;
+                        const rotation = -3 + 6 * progress; // 减小旋转幅度
                         bullet.style.transform = `rotate(${rotation}deg)`;
 
                         // 在中间位置添加特效
                         if (progress > 0.4 && progress < 0.6) {
                             bullet.style.opacity = '1';
-                            bullet.style.textShadow = '0 0 15px #ff4d94, 0 0 25px #ff4d94';
-                            bullet.style.fontSize = `${fontSize + 6}px`;
+                            bullet.style.textShadow = '0 0 10px #ff4d94, 0 0 20px #ff4d94'; // 减小光晕效果
+                            bullet.style.fontSize = `${fontSize + 4}px`; // 减小放大效果
                         } else {
                             bullet.style.opacity = '0.7';
                             bullet.style.textShadow = '1px 1px 5px rgba(0, 0, 0, 0.8)';
@@ -398,6 +404,11 @@
                         // 动画结束，移除元素
                         if (bullet.parentNode) {
                             bullet.parentNode.removeChild(bullet);
+                        }
+                        // 从活动弹幕数组中移除
+                        const index = activeBullets.indexOf(bullet);
+                        if (index > -1) {
+                            activeBullets.splice(index, 1);
                         }
                     }
                 }
@@ -434,7 +445,7 @@
                 }
 
                 // 随机设置爱心大小
-                const size = Math.floor(Math.random() * 25) + 15;
+                const size = Math.floor(Math.random() * 20) + 15; // 减小爱心大小范围
                 heart.style.width = `${size}px`;
                 heart.style.height = `${size}px`;
 
@@ -443,7 +454,7 @@
                 heart.style.left = `${left}vw`;
 
                 // 随机设置爱心的动画时长
-                const duration = Math.floor(Math.random() * 10) + 10;
+                const duration = Math.floor(Math.random() * 8) + 10; // 减小随机范围
                 heart.style.animationDuration = `${duration}s`;
 
                 heartsContainer.appendChild(heart);
@@ -474,10 +485,22 @@
             window.addEventListener('resize', function () {
                 screenHeight = window.innerHeight;
 
-                // 如果弹幕正在运行，重新启动弹幕
-                if (isInitialized) {
+                // 如果弹幕正在运行，重新调整所有活动弹幕的位置
+                if (isInitialized && activeBullets.length > 0) {
+                    // 这里可以添加逻辑来调整现有弹幕的位置
+                    // 但为了简单起见，我们只是重新开始弹幕
                     if (bulletInterval) {
                         clearInterval(bulletInterval);
+
+                        // 移除所有现有弹幕
+                        activeBullets.forEach(bullet => {
+                            if (bullet.parentNode) {
+                                bullet.parentNode.removeChild(bullet);
+                            }
+                        });
+                        activeBullets = [];
+
+                        // 重新开始弹幕
                         startBulletScreen();
                     }
                 }
