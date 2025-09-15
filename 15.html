@@ -82,6 +82,18 @@
             color: #666;
         }
 
+        .bullet-screen-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 5;
+            display: none;
+            /* 初始隐藏，等待黑色背景显示后再显示 */
+        }
+
         .bullet-screen {
             position: absolute;
             white-space: nowrap;
@@ -165,6 +177,8 @@
             height: 100%;
             pointer-events: none;
             z-index: 5;
+            display: none;
+            /* 初始隐藏，等待黑色背景显示后再显示 */
         }
 
         .heart {
@@ -232,6 +246,7 @@
         </div>
     </div>
 
+    <div class="bullet-screen-container" id="bulletContainer"></div>
     <div class="hearts-container" id="heartsContainer"></div>
 
     <div class="music-player" id="musicPlayer">
@@ -251,6 +266,7 @@
             const musicPlayer = document.getElementById('musicPlayer');
             const bgMusic = document.getElementById('bgMusic');
             const heartsContainer = document.getElementById('heartsContainer');
+            const bulletContainer = document.getElementById('bulletContainer');
             const background = document.getElementById('background');
             const blackBg = document.getElementById('blackBg');
             const playButton = document.getElementById('playButton');
@@ -279,6 +295,7 @@
             let heartsInterval;
             let isPlaying = false;
             let isInitialized = false;
+            let isMobile = window.innerWidth <= 768; // 判断是否为移动设备
 
             // 显示播放按钮
             playButton.style.display = 'block';
@@ -322,6 +339,10 @@
                     background.style.opacity = '0';
                     blackBg.style.opacity = '1';
 
+                    // 显示弹幕和爱心容器
+                    bulletContainer.style.display = 'block';
+                    heartsContainer.style.display = 'block';
+
                     // 开始弹幕
                     startBulletScreen();
 
@@ -349,15 +370,22 @@
                 const randomMessage = bulletMessages[Math.floor(Math.random() * bulletMessages.length)];
                 bullet.textContent = randomMessage;
 
-                // 随机设置弹幕的水平位置
-                const left = Math.random() * 100;
+                // 根据设备类型设置不同的水平位置范围
+                let left;
+                if (isMobile) {
+                    // 移动设备：限制在5%-95%范围内，避免边缘显示问题
+                    left = Math.random() * 90 + 5;
+                } else {
+                    // 桌面设备：使用更宽的范围
+                    left = Math.random() * 100;
+                }
                 bullet.style.left = `${left}%`;
 
                 // 随机设置弹幕的动画时长
                 const duration = Math.floor(Math.random() * 8) + 12;
                 bullet.style.animationDuration = `${duration}s`;
 
-                document.body.appendChild(bullet);
+                bulletContainer.appendChild(bullet);
 
                 // 动画结束后移除弹幕元素
                 setTimeout(() => {
@@ -429,6 +457,11 @@
                     musicPlayer.style.background = 'rgba(255, 255, 255, 0.4)';
                 }
                 isPlaying = !isPlaying;
+            });
+
+            // 窗口大小变化时重新判断设备类型
+            window.addEventListener('resize', function () {
+                isMobile = window.innerWidth <= 768;
             });
         });
     </script>
