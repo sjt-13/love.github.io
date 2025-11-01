@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>心形弹窗效果</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            overflow: hidden;
+            font-family: 'Microsoft YaHei', sans-serif;
+            user-select: none;
+        }
+
+        .tip-window {
+            position: absolute;
+            width: 120px;
+            height: 60px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            z-index: 10;
+            font-weight: bold;
+            font-size: 15px;
+            transition: opacity 0.5s;
+            cursor: default;
+            color: #000;
+            /* 改为黑色字体 */
+            opacity: 0;
+            animation: fadeIn 0.5s forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .bullet-window {
+            position: absolute;
+            white-space: nowrap;
+            padding: 8px 15px;
+            border-radius: 20px;
+            z-index: 10;
+            font-weight: bold;
+            font-size: 20px;
+            color: #000;
+            /* 改为黑色字体 */
+            opacity: 0;
+            animation: fadeIn 0.5s forwards, floatAround 15s linear forwards;
+        }
+
+        @keyframes floatAround {
+            0% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+
+            25% {
+                transform: translate(100px, 50px) rotate(5deg);
+            }
+
+            50% {
+                transform: translate(200px, -30px) rotate(-5deg);
+            }
+
+            75% {
+                transform: translate(-100px, 80px) rotate(3deg);
+            }
+
+            100% {
+                transform: translate(-200px, -50px) rotate(-3deg);
+            }
+        }
+
+        .star {
+            position: absolute;
+            background-color: white;
+            border-radius: 50%;
+            z-index: 0;
+        }
+
+        .shooting-star {
+            position: absolute;
+            background: linear-gradient(to right, transparent, white);
+            height: 2px;
+            z-index: 0;
+        }
+
+        .heart-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .transition-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 1s;
+        }
+
+        .transition-text {
+            color: white;
+            font-size: 36px;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="heart-container" id="heartContainer"></div>
+    <div class="transition-overlay" id="transitionOverlay">
+        <div class="transition-text">大姐，请原谅我 爱你爱你爱你~</div>
+    </div>
+
+    <script>
+        // 屏幕尺寸
+        const SCREEN_W = window.innerWidth;
+        const SCREEN_H = window.innerHeight;
+
+        // 窗口大小
+        const WINDOW_W = 120;
+        const WINDOW_H = 60;
+
+        // 心形点数
+        const desired_points = 120;
+
+        // 存储所有窗口的数组
+        let all_windows = [];
+        let heart_windows = [];
+        let close_all_flag = false;
+        let isLooping = false;
+        let isFirstHeartCompleted = false;
+
+        // 随机提示语
+        const tips = [
+            "天天开心~", "我想你了~", "矮LOVE油~", "求求你啦~",
+            "考试100分", "不要生气啦~", "好不好嘛", "原谅我嘛~",
+            "你最好啦", "I love you~", "每天都想你",
+            "你会一直幸福~", "想你的每一天", "爱你爱你爱你~", "大姐是全世界最好看的女人"
+        ];
+
+        // 创建星星背景
+        function createStars() {
+            // 创建静态星星
+            for (let i = 0; i < 100; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+
+                const size = Math.random() * 2 + 1;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+
+                star.style.left = `${Math.random() * SCREEN_W}px`;
+                star.style.top = `${Math.random() * SCREEN_H}px`;
+
+                star.style.opacity = Math.random() * 0.7 + 0.3;
+
+                document.body.appendChild(star);
+            }
+
+            // 创建流星
+            function createShootingStar() {
+                const shootingStar = document.createElement('div');
+                shootingStar.className = 'shooting-star';
+
+                const length = Math.random() * 100 + 50;
+                shootingStar.style.width = `${length}px`;
+
+                const startX = Math.random() * SCREEN_W;
+                const startY = Math.random() * SCREEN_H / 2;
+
+                shootingStar.style.left = `${startX}px`;
+                shootingStar.style.top = `${startY}px`;
+
+                const angle = Math.random() * 30 + 15;
+                shootingStar.style.transform = `rotate(${angle}deg)`;
+
+                document.body.appendChild(shootingStar);
+
+                // 流星动画
+                shootingStar.animate([
+                    { opacity: 0, transform: `rotate(${angle}deg) translateX(0)` },
+                    { opacity: 1, transform: `rotate(${angle}deg) translateX(${length}px)` },
+                    { opacity: 0, transform: `rotate(${angle}deg) translateX(${length * 2}px)` }
+                ], {
+                    duration: 2000,
+                    easing: 'ease-out'
+                }).onfinish = () => {
+                    document.body.removeChild(shootingStar);
+                };
+
+                // 随机时间后创建下一个流星
+                setTimeout(createShootingStar, Math.random() * 3000 + 2000);
+            }
+
+            // 开始创建流星
+            createShootingStar();
+        }
+
+        // 生成心形坐标点（从顶部开始）
+        function generateHeartPoints(num_points, screen_w, screen_h, window_w, window_h) {
+            const points = [];
+            const center_x = screen_w / 2;
+            const center_y = screen_h / 2;
+
+            // 找到心形的顶部点作为起点
+            let startIndex = 0;
+            let minY = Infinity;
+
+            // 先生成所有点，找到y坐标最小的点（顶部）
+            const tempPoints = [];
+            for (let i = 0; i < num_points; i++) {
+                const t = i / num_points * 2 * Math.PI;
+                const x = 16 * Math.pow(Math.sin(t), 3);
+                const y = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t);
+
+                // 缩放和平移
+                const scale = Math.min(screen_w / 28, screen_h / 28);
+                const final_x = center_x + x * scale;
+                const final_y = center_y - y * scale - 100;
+
+                // 确保窗口在屏幕内
+                const bounded_x = Math.max(window_w / 2, Math.min(final_x, screen_w - window_w / 2));
+                const bounded_y = Math.max(window_h / 2, Math.min(final_y, screen_h - window_h / 2));
+
+                tempPoints.push({ x: bounded_x, y: bounded_y });
+
+                // 找到y坐标最小的点（顶部）
+                if (bounded_y < minY) {
+                    minY = bounded_y;
+                    startIndex = i;
+                }
+            }
+
+            // 从顶部点开始重新排列点
+            for (let i = 0; i < num_points; i++) {
+                const index = (startIndex + i) % num_points;
+                points.push(tempPoints[index]);
+            }
+
+            return points;
+        }
+
+        // 显示提示窗口
+        function showWarnTip(x, y, w, h) {
+            if (close_all_flag) return null;
+
+            // 创建弹窗元素
+            const tipWindow = document.createElement('div');
+            tipWindow.className = 'tip-window';
+
+            // 随机颜色
+            const r = Math.floor(Math.random() * 56) + 200;
+            const g = Math.floor(Math.random() * 56) + 200;
+            const b = Math.floor(Math.random() * 56) + 200;
+            tipWindow.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
+
+            // 随机提示语
+            const tip = tips[Math.floor(Math.random() * tips.length)];
+            tipWindow.textContent = tip;
+
+            // 设置位置
+            tipWindow.style.left = `${x - w / 2}px`;
+            tipWindow.style.top = `${y - h / 2}px`;
+
+            // 添加到页面
+            document.getElementById('heartContainer').appendChild(tipWindow);
+
+            // 添加到窗口列表
+            all_windows.push(tipWindow);
+            heart_windows.push(tipWindow);
+
+            return tipWindow;
+        }
+
+        // 显示弹幕窗口
+        function showBulletWindow() {
+            if (close_all_flag) return null;
+
+            // 创建弹幕元素
+            const bulletWindow = document.createElement('div');
+            bulletWindow.className = 'bullet-window';
+
+            // 随机颜色
+            const r = Math.floor(Math.random() * 56) + 200;
+            const g = Math.floor(Math.random() * 56) + 200;
+            const b = Math.floor(Math.random() * 56) + 200;
+            bulletWindow.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
+
+            // 随机提示语
+            const tip = tips[Math.floor(Math.random() * tips.length)];
+            bulletWindow.textContent = tip;
+
+            // 随机位置
+            const left = Math.random() * (SCREEN_W - 150);
+            const top = Math.random() * (SCREEN_H - 40);
+            bulletWindow.style.left = `${left}px`;
+            bulletWindow.style.top = `${top}px`;
+
+            // 添加到页面
+            document.body.appendChild(bulletWindow);
+
+            // 添加到窗口列表
+            all_windows.push(bulletWindow);
+
+            // 动画结束后自动删除
+            setTimeout(() => {
+                if (bulletWindow.parentNode) {
+                    document.body.removeChild(bulletWindow);
+                    const index = all_windows.indexOf(bulletWindow);
+                    if (index > -1) {
+                        all_windows.splice(index, 1);
+                    }
+                }
+            }, 15000);
+
+            return bulletWindow;
+        }
+
+        // 关闭所有窗口
+        function closeAllWindows() {
+            close_all_flag = true;
+            isLooping = false;
+
+            // 淡出所有窗口
+            all_windows.forEach(window => {
+                window.style.opacity = '0';
+                setTimeout(() => {
+                    if (window.parentNode) {
+                        window.parentNode.removeChild(window);
+                    }
+                }, 500);
+            });
+
+            all_windows = [];
+            heart_windows = [];
+            close_all_flag = false;
+        }
+
+        // 清除心形窗口
+        function clearHeartWindows() {
+            heart_windows.forEach(window => {
+                window.style.opacity = '0';
+                setTimeout(() => {
+                    if (window.parentNode) {
+                        window.parentNode.removeChild(window);
+                    }
+                }, 500);
+            });
+
+            // 从all_windows中移除
+            heart_windows.forEach(window => {
+                const index = all_windows.indexOf(window);
+                if (index > -1) {
+                    all_windows.splice(index, 1);
+                }
+            });
+
+            heart_windows = [];
+        }
+
+        // 开始显示弹窗
+        function startDisplay() {
+            isLooping = true;
+            const points = generateHeartPoints(desired_points, SCREEN_W, SCREEN_H, WINDOW_W, WINDOW_H);
+
+            function displayLoop() {
+                if (!isLooping) return;
+
+                let index = 0;
+
+                function showNextWindow() {
+                    if (index >= points.length || close_all_flag || !isLooping) {
+                        // 完成一轮后，如果仍在循环模式，重新开始
+                        if (isLooping) {
+                            // 标记第一轮心形已完成
+                            if (!isFirstHeartCompleted) {
+                                isFirstHeartCompleted = true;
+
+                                // 显示过渡效果
+                                const overlay = document.getElementById('transitionOverlay');
+                                overlay.style.opacity = '1';
+
+                                // 2秒后切换到弹幕模式
+                                setTimeout(() => {
+                                    overlay.style.opacity = '0';
+                                    clearHeartWindows();
+                                    startBulletMode();
+                                }, 2000);
+                                return;
+                            }
+                        }
+                        return;
+                    }
+
+                    const point = points[index];
+                    showWarnTip(point.x, point.y, WINDOW_W, WINDOW_H);
+
+                    index++;
+
+                    if (index < points.length) {
+                        setTimeout(showNextWindow, 200);
+                    } else {
+                        // 完成一轮后，如果仍在循环模式，重新开始
+                        if (isLooping) {
+                            // 标记第一轮心形已完成
+                            if (!isFirstHeartCompleted) {
+                                isFirstHeartCompleted = true;
+
+                                // 显示过渡效果
+                                const overlay = document.getElementById('transitionOverlay');
+                                overlay.style.opacity = '1';
+
+                                // 2秒后切换到弹幕模式
+                                setTimeout(() => {
+                                    overlay.style.opacity = '0';
+                                    clearHeartWindows();
+                                    startBulletMode();
+                                }, 2000);
+                            }
+                        }
+                    }
+                }
+
+                showNextWindow();
+            }
+
+            displayLoop();
+        }
+
+        // 开始弹幕模式
+        function startBulletMode() {
+            function bulletLoop() {
+                if (!isLooping || close_all_flag) return;
+
+                // 生成弹幕
+                showBulletWindow();
+
+                // 继续循环，随机间隔生成弹幕
+                setTimeout(bulletLoop, Math.random() * 500 + 300); // 300-800ms间隔
+            }
+
+            bulletLoop();
+        }
+
+        // ESC键监听
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                closeAllWindows();
+            }
+        });
+
+        // 页面加载完成后自动开始
+        window.addEventListener('load', function () {
+            createStars(); // 创建星星背景
+            startDisplay(); // 开始弹窗循环
+        });
+    </script>
+</body>
+
+</html>
