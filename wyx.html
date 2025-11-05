@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>to wyx</title>
     <style>
+        /* 保持原有样式不变 */
         * {
             margin: 0;
             padding: 0;
@@ -38,7 +39,7 @@
             z-index: 1;
         }
 
-        /* 雪花容器 - 最高层级 */
+        /* 雪花容器 */
         #snow-container {
             position: absolute;
             top: 0;
@@ -89,23 +90,17 @@
             justify-content: center;
             position: relative;
             perspective: 1000px;
-
-            /* 精美边框效果 */
             border: 3px solid transparent;
             background:
                 linear-gradient(45deg, #000 0%, #000 100%),
                 linear-gradient(135deg, #ff6b9d, #4ecdc4, #45b7d1, #96ceb4, #ffeaa7, #dda0dd, #98d8c8);
             background-clip: padding-box, border-box;
             background-origin: padding-box, border-box;
-
-            /* 多重阴影效果 */
             box-shadow:
                 0 0 50px rgba(255, 107, 157, 0.3),
                 0 0 80px rgba(78, 205, 196, 0.2),
                 0 0 120px rgba(69, 183, 209, 0.1),
                 inset 0 0 30px rgba(255, 255, 255, 0.1);
-
-            /* 3D立体效果 */
             transform-style: preserve-3d;
         }
 
@@ -135,7 +130,6 @@
             border-radius: 0 0 8px 0;
         }
 
-        /* 添加额外的装饰角 */
         .corner-top-right,
         .corner-bottom-left {
             position: absolute;
@@ -493,7 +487,7 @@
         <div id="album-container">
             <div class="main-image">
                 <!-- 点击提示 -->
-                <div class="click-prompt" id="click-prompt">点我一下</div>
+                <div class="click-prompt" id="click-prompt">点我开始</div>
                 <!-- 倒计时显示 -->
                 <div class="countdown" id="countdown"></div>
                 <!-- 主图片将通过JavaScript动态生成 -->
@@ -501,9 +495,9 @@
                 <div class="corner-bottom-left"></div>
             </div>
         </div>
-        <div class="music-control" id="music-control">
+        <div class="music-control" id="music-control" style="display: none;">
             <svg viewBox="0 0 24 24">
-                <path d="M6 6h12v12H6z" />
+                <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
             </svg>
         </div>
         <div class="loading" id="loading">正在加载音乐，请稍候...</div>
@@ -519,69 +513,36 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
     <script>
-        // 图片数据 - 针对手机优化
+        // 图片数据
         const images = [
-            {
-                src: "image/1.jpg"
-            },
-            {
-                src: "image/2.jpg"
-            },
-            {
-                src: "image/3.jpg"
-            },
-            {
-                src: "image/4.jpg"
-            },
-            {
-                src: "image/5.jpg"
-            },
-            {
-                src: "image/6.jpg"
-            },
-            {
-                src: "image/7.jpg"
-            },
-            {
-                src: "image/8.jpg"
-            },
-            {
-                src: "image/9.jpg"
-            },
-            {
-                src: "image/10.jpg"
-            },
-            {
-                src: "image/11.jpg"
-            },
-            {
-                src: "image/12.jpg"
-            },
-            {
-                src: "image/13.jpg"
-            },
-            {
-                src: "image/14.jpg"
-            },
-            {
-                src: "image/15.jpg"
-            },
-            {
-                src: "image/16.jpg"
-            },
-            {
-                src: "image/17.jpg"
-            }
+            { src: "image/1.jpg" },
+            { src: "image/2.jpg" },
+            { src: "image/3.jpg" },
+            { src: "image/4.jpg" },
+            { src: "image/5.jpg" },
+            { src: "image/6.jpg" },
+            { src: "image/7.jpg" },
+            { src: "image/8.jpg" },
+            { src: "image/9.jpg" },
+            { src: "image/10.jpg" },
+            { src: "image/11.jpg" },
+            { src: "image/12.jpg" },
+            { src: "image/13.jpg" },
+            { src: "image/14.jpg" },
+            { src: "image/15.jpg" },
+            { src: "image/16.jpg" },
+            { src: "image/17.jpg" }
         ];
 
-        // 当前显示的图片索引
+        // 全局变量
         let currentIndex = 0;
         let backgroundMusic;
         let isMusicPlaying = false;
         let isSlideshowStarted = false;
         let slideshowInterval;
         let loopCount = 0;
-        const maxLoops = 1; // 轮播循环次数
+        const maxLoops = 1;
+        let userInteracted = false; // 新增：标记用户是否已交互
 
         // 初始化雪花效果
         function initSnow() {
@@ -598,27 +559,18 @@
         function createSnowflake(container, snowflakes) {
             const snowflake = document.createElement('div');
             snowflake.className = 'snowflake';
-
-            const randomFlake = snowflakes[Math.floor(Math.random() * snowflakes.length)];
-            snowflake.textContent = randomFlake;
+            snowflake.textContent = snowflakes[Math.floor(Math.random() * snowflakes.length)];
 
             const size = Math.random() * 20 + 15;
             snowflake.style.fontSize = `${size}px`;
-
-            const opacity = Math.random() * 0.7 + 0.3;
-            snowflake.style.opacity = opacity;
-
-            const startX = Math.random() * 100;
-            snowflake.style.left = `${startX}vw`;
+            snowflake.style.opacity = Math.random() * 0.7 + 0.3;
+            snowflake.style.left = `${Math.random() * 100}vw`;
             snowflake.style.top = '-50px';
 
             const fallDuration = Math.random() * 12 + 10;
             const swayDistance = Math.random() * 100 + 50;
-
             snowflake.style.setProperty('--sway-distance', `${Math.random() > 0.5 ? '' : '-'}${swayDistance}px`);
-
             snowflake.style.animation = `snowFall ${fallDuration}s linear infinite`;
-
             snowflake.style.animationDelay = `${Math.random() * 5}s`;
 
             container.appendChild(snowflake);
@@ -634,7 +586,6 @@
         // 初始化相册
         function initAlbum() {
             const mainImageContainer = document.querySelector('.main-image');
-
             const existingImages = mainImageContainer.querySelectorAll('img');
             existingImages.forEach(img => img.remove());
 
@@ -699,11 +650,9 @@
             slideshowInterval = setInterval(() => {
                 currentIndex = (currentIndex + 1) % images.length;
 
-                // 检查是否完成一轮循环
                 if (currentIndex === 0) {
                     loopCount++;
                     if (loopCount >= maxLoops) {
-                        // 轮播结束，切换到爱心页面
                         clearInterval(slideshowInterval);
                         showHeartAnimation();
                         return;
@@ -722,23 +671,20 @@
 
         // 显示爱心动画
         function showHeartAnimation() {
-            // 隐藏相册页面
             document.getElementById('album-container').style.display = 'none';
             document.getElementById('music-control').style.display = 'none';
             document.getElementById('canvas-container').style.display = 'none';
             document.getElementById('snow-container').style.display = 'none';
 
-            // 显示爱心页面
             const heartPage = document.getElementById('heart-page');
             heartPage.style.display = 'block';
 
-            // 初始化爱心动画
             initHeartAnimation();
         }
 
         // 初始化爱心动画
         function initHeartAnimation() {
-            // 爱心粒子效果
+            // 爱心粒子效果代码保持不变
             var settings = {
                 particles: {
                     length: 400,
@@ -974,7 +920,6 @@
                 const y = Math.random() * (window.innerHeight - 50);
                 text.style.left = `${x}px`;
                 text.style.top = `${y}px`;
-
                 text.style.animationDelay = `${Math.random() * 5}s`;
 
                 document.getElementById('heart-page').appendChild(text);
@@ -994,40 +939,116 @@
             }
         }
 
-        // 初始化背景音乐
+        // 初始化背景音乐 - 修复版本
         function initBackgroundMusic() {
             const loading = document.getElementById('loading');
-            loading.style.display = 'block';
+            const clickPrompt = document.getElementById('click-prompt');
+            const musicControl = document.getElementById('music-control');
 
+            // 显示加载提示
+            loading.style.display = 'block';
+            loading.innerHTML = '正在加载音乐资源...';
+
+            // 创建音频对象
             backgroundMusic = new Audio();
             backgroundMusic.src = "13.mp3";
             backgroundMusic.loop = true;
             backgroundMusic.volume = 0.5;
+            backgroundMusic.preload = "auto";
 
+            // 设置加载超时
+            const loadTimeout = setTimeout(() => {
+                console.log('音乐加载超时，继续显示界面');
+                loading.style.display = 'none';
+                clickPrompt.style.display = 'block';
+                musicControl.style.display = 'flex';
+            }, 8000);
+
+            // 音乐加载成功
+            backgroundMusic.addEventListener('canplaythrough', function () {
+                clearTimeout(loadTimeout);
+                console.log('音乐加载完成');
+                loading.style.display = 'none';
+                clickPrompt.style.display = 'block';
+                musicControl.style.display = 'flex';
+            });
+
+            // 音乐加载失败
             backgroundMusic.addEventListener('error', function (e) {
+                clearTimeout(loadTimeout);
                 console.error('音乐加载失败:', e);
-                loading.innerHTML = '音乐文件加载失败<br>请检查文件路径';
+                loading.innerHTML = '音乐加载失败<br>点击继续查看图片';
                 setTimeout(() => {
                     loading.style.display = 'none';
+                    clickPrompt.style.display = 'block';
+                    musicControl.style.display = 'flex';
                 }, 3000);
             });
 
-            backgroundMusic.addEventListener('canplaythrough', function () {
-                console.log('音乐可以播放');
-                loading.style.display = 'none';
+            // 点击提示事件 - 用户第一次交互
+            clickPrompt.addEventListener('click', function () {
+                userInteracted = true; // 标记用户已交互
+
+                // 尝试播放音乐
+                playMusic().then(() => {
+                    // 音乐播放成功，开始倒计时
+                    startCountdown();
+                }).catch(error => {
+                    console.log("音乐播放失败，但继续展示图片:", error);
+                    // 即使音乐播放失败，也继续展示图片
+                    startCountdown();
+                });
             });
 
-            document.getElementById('click-prompt').addEventListener('click', function () {
+            // 音乐控制按钮事件
+            musicControl.addEventListener('click', function (e) {
+                e.stopPropagation();
+                if (!userInteracted) {
+                    userInteracted = true;
+                }
+
+                if (isMusicPlaying) {
+                    backgroundMusic.pause();
+                    isMusicPlaying = false;
+                } else {
+                    playMusic().catch(err => {
+                        console.log('播放失败:', err);
+                        const loading = document.getElementById('loading');
+                        loading.style.display = 'block';
+                        loading.innerHTML = '请先点击页面开始播放';
+                        setTimeout(() => {
+                            loading.style.display = 'none';
+                        }, 2000);
+                    });
+                }
+                updateMusicButton();
+            });
+        }
+
+        // 播放音乐的独立函数
+        function playMusic() {
+            return new Promise((resolve, reject) => {
+                if (!backgroundMusic) {
+                    reject(new Error('音乐未初始化'));
+                    return;
+                }
+
                 const playPromise = backgroundMusic.play();
+
                 if (playPromise !== undefined) {
                     playPromise.then(() => {
                         isMusicPlaying = true;
                         updateMusicButton();
-                        startCountdown();
+                        resolve();
                     }).catch(error => {
-                        console.log("音乐播放失败:", error);
-                        startCountdown();
+                        console.error("音乐播放失败:", error);
+                        reject(error);
                     });
+                } else {
+                    // 对于不支持Promise的老版本浏览器
+                    isMusicPlaying = true;
+                    updateMusicButton();
+                    resolve();
                 }
             });
         }
@@ -1041,22 +1062,6 @@
                 musicControl.innerHTML = '<svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>';
             }
         }
-
-        // 音乐控制按钮事件
-        document.getElementById('music-control').addEventListener('click', function (e) {
-            e.stopPropagation();
-            if (isMusicPlaying) {
-                backgroundMusic.pause();
-                isMusicPlaying = false;
-            } else {
-                backgroundMusic.play().then(() => {
-                    isMusicPlaying = true;
-                }).catch(err => {
-                    console.log('播放失败:', err);
-                });
-            }
-            updateMusicButton();
-        });
 
         // 初始化星空背景
         function initStarfield() {
@@ -1075,7 +1080,6 @@
             canvasContainer.appendChild(renderer.domElement);
 
             const starCount = 800;
-
             const starGeometry = new THREE.BufferGeometry();
             const starPositions = new Float32Array(starCount * 3);
 
@@ -1126,6 +1130,11 @@
         document.addEventListener('touchmove', function (e) {
             e.preventDefault();
         }, { passive: false });
+
+        // 添加全局点击事件，确保任何点击都能标记为用户交互
+        document.addEventListener('click', function () {
+            userInteracted = true;
+        });
     </script>
 </body>
 
